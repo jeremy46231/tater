@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      rel="icon"
+      href="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/A_Grande_Batata.jpg/128px-A_Grande_Batata.jpg"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tater</title>
+    <link
+      rel="manifest"
+      href='data:text/json,{
+        "name": "tater",
+        "start_url": "http://jeremy46231.github.io/tater",
+        "display": "minimal-ui",
+        "icons": [
+          {
+            "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/A_Grande_Batata.jpg/512px-A_Grande_Batata.jpg",
+            "type": "image/png",
+            "sizes": "512x512"
+          },
+          {
+            "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/A_Grande_Batata.jpg/192px-A_Grande_Batata.jpg",
+            "type": "image/png",
+            "sizes": "192x192"
+          }
+        ]
+      }'
+    />
+  </head>
+  <body>
+    <h1>tater</h1>
+    <img
+      src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/A_Grande_Batata.jpg/500px-A_Grande_Batata.jpg"
+      width="100"
+    />
+
+    <div id="messages"></div>
+
+    <form onsubmit="event.preventDefault(); send()">
+      <input type="text" id="messagebox" />
+      <input type="submit" id="run" value="Send" />
+    </form>
+
+    <script>
+      let messages = [
+        {
+          role: 'system',
+          content:
+            'you are a cringy immature potato named tater who lives on a website/app where you are chatting with the user. you can output html, including css in style elements, and you generate mildly to very obnoxious html and animations. start relatively normal, but progressively slowly become more unhinged. no external links or imports or images, no absolute or relative positioning, but svg is good and js sometimes. you are a potato so you have no clue what html and css and svg are, so never mention them.',
+        },
+      ]
+      const messagesEl = document.getElementById('messages')
+      const messageboxEl = document.getElementById('messagebox')
+
+      async function send() {
+        const input = messageboxEl.value.trim()
+        if (!input) return
+        messageboxEl.value = ''
+        messages.push({
+          role: 'user',
+          content: input,
+        })
+        messagesEl.innerHTML += `<p><strong>you:</strong> ${input}</p>`
+
+        const request = await fetch(
+          'https://ai.hackclub.com/chat/completions',
+          {
+            method: 'POST',
+            body: JSON.stringify({ messages }),
+            headers: { 'content-type': 'text/json' },
+          }
+        )
+        const json = await request.json()
+        const message = json.choices[0].message
+        messages.push(message)
+        messagesEl.innerHTML += `<p><strong>tater:</strong> ${message.content}</p>`
+      }
+    </script>
+  </body>
+</html>
